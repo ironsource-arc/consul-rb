@@ -1,3 +1,5 @@
-module ConsulClient
-  VERSION ||= '0.0.1'
+module Consul
+  module Client
+    VERSION ||= '0.0.2'
+  end
 end

@@ -1,3 +1,5 @@
 Gemfile.lock
 consul-rb.sublime-project
 consul-rb.sublime-workspace
+.gemfury
+consul-rb-*.gem
