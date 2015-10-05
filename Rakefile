@@ -12,4 +12,3 @@ end
 task :gemfury => :build do
   system "curl -F package=@consul-rb-#{Consul::Client::VERSION}.gem $(cat .gemfury)"
 end
-
