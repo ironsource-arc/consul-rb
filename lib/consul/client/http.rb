@@ -68,9 +68,9 @@ module Consul
           begin
             logger.debug("GET #{uri}")
 
-            response = http_request(:get, uri, wait_timeout)
+            response = http_request(:get, uri, nil, wait_timeout)
             if response['x-consul-index'].to_i > index
-              return { index: response['x-consul-index'], body: parse_body(response) }
+              return { index: response['x-consul-index'].to_i, body: parse_body(response) }
             end
           rescue RpcErrorException
             logger.warn("Got 500 while watching #{uri}")
@@ -111,7 +111,7 @@ module Consul
         }.fetch(method)
 
         http = Net::HTTP.new(uri.host, uri.port)
-        http.read_timeout(timeout)
+        http.read_timeout = timeout
         request = method.new(uri.request_uri)
         request.body = data
 
