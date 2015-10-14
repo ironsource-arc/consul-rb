@@ -69,7 +69,7 @@ module Consul
             logger.debug("GET #{uri}")
 
             response = http_request(:get, uri, nil, wait_timeout)
-            if response['x-consul-index'].to_i > index
+            unless response['x-consul-index'].to_i == index
               return { index: response['x-consul-index'].to_i, body: parse_body(response) }
             end
           rescue RpcErrorException
