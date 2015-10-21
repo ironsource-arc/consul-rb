@@ -92,6 +92,22 @@ module Consul
         parse_body(response)
       end
 
+      def delete(request_uri)
+        url = base_uri + request_uri
+        logger.debug("DELETE #{url}")
+
+        uri = URI.parse(url)
+
+        response = http_request(:delete, uri, request_uri.match('^/kv/') ? data : data.to_json)
+
+        begin
+          response = http_request(:get, uri)
+          parse_body(response)
+        rescue NotFoundException
+          nil
+        end
+      end
+
       attr_accessor :logger
 
       protected
@@ -108,6 +124,7 @@ module Consul
         method = {
           get: Net::HTTP::Get,
           put: Net::HTTP::Put,
+          delete: Net::HTTP::Delete
         }.fetch(method)
 
         http = Net::HTTP.new(uri.host, uri.port)
