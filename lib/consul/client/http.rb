@@ -46,6 +46,17 @@ module Consul
         return true
       end
 
+      def mkdir(request_uri, recurse: false)
+        request_uri = "/#{request_uri}/".gsub(/\/+/,'/')
+        put(request_uri) unless exists?(request_uri)
+        if recurse
+          while File.dirname(request_uri) != "/kv"
+            request_uri = File.dirname(request_uri)
+            put(request_uri) unless exists?(request_uri)
+          end
+        end
+      end
+
       def watch(request_uri, index: 0, wait: '60s', recurse: false)
         url = base_uri + request_uri
 
