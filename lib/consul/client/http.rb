@@ -109,10 +109,8 @@ module Consul
 
         uri = URI.parse(url)
 
-        response = http_request(:delete, uri, request_uri.match('^/kv/') ? data : data.to_json)
-
         begin
-          response = http_request(:get, uri)
+          response = http_request(:delete, uri)
           parse_body(response)
         rescue NotFoundException
           nil
