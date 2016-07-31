@@ -8,8 +8,8 @@ module Consul
     end
 
     class V1
-      def http(host: "localhost", port: 8500, logger: Logger.new("/dev/null"))
-        HTTP.new(host: host, port: port, logger: logger)
+      def http(host: "localhost", port: 8500, logger: Logger.new("/dev/null"), rpc_retries_timeout: 10)
+        HTTP.new(host: host, port: port, logger: logger, rpc_retries_timeout: rpc_retries_timeout)
       end
     end
   end
