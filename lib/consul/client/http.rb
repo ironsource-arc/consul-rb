@@ -12,10 +12,11 @@ module Consul
     InavlidArgument = Class.new(StandardError)
 
     class HTTP
-      def initialize(host:, port:, logger:)
+      def initialize(host:, port:, logger:, rpc_retries_timeout:)
         @host   = host
         @port   = port
         @logger = logger
+        @rpc_retries_timeout = rpc_retries_timeout
       end
 
       def get(request_uri, recurse: false, raw: false)
@@ -129,7 +130,10 @@ module Consul
         JSON.parse("[#{response.body}]")[0]
       end
 
-      def http_request(method, uri, data = nil, timeout = 60)
+      def http_request(method, uri, data = nil, timeout = 60, rpc_retries_timeout = nil)
+        start = Time.now
+        rpc_retries_timeout ||= @rpc_retries_timeout
+
         method = {
           get: Net::HTTP::Get,
           put: Net::HTTP::Put,
@@ -153,6 +157,13 @@ module Consul
           end
         rescue Net::ReadTimeout
           raise TimeoutException, "timeout on #{uri}"
+        rescue RpcErrorException
+          if Time.now - start > rpc_retries_timeout
+            raise RpcErrorException, "#{response.code} on #{uri} lasted for over #{rpc_retries_timeout} seconds"
+          else
+            sleep 1
+            retry
+          end
         end
 
         response
